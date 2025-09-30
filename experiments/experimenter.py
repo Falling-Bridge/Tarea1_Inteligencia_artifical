@@ -1,5 +1,4 @@
 import time
-import numpy as np
 import random
 from core.maze import Maze
 from agents.search_agent import SearchAgent
@@ -7,8 +6,7 @@ from agents.genetic_agent import GeneticAgent
 from utils.metrics import exportar_resultados
 
 class Experimentador:
-
-    def __init__(self, result_collector=None):
+    def __init__(self):
         self.resultados = []
     
     def ejecutar_experimento(self, configuracion):
@@ -21,24 +19,18 @@ class Experimentador:
             'genetico': []
         }
         
-        # Determinar si usar semilla fija o aleatoria
         semilla_base = configuracion.get('semilla_base')
-        usar_semillas_fijas = semilla_base is not None
-        
-        if usar_semillas_fijas:
-            print(f"Usando semilla base: {semilla_base} (reproducible)")
-        else:
-            print("Usando semillas aleatorias para cada repetición")
         
         for i in range(configuracion['repeticiones']):
             print(f"  Repetición {i+1}/{configuracion['repeticiones']}...")
             
-            # Determinar la semilla para esta repetición
-            if usar_semillas_fijas:
+            # Determinar semilla para esta repetición
+            if semilla_base is not None:
                 semilla_actual = semilla_base + i
             else:
                 semilla_actual = random.randint(1, 10000)
             
+            # Crear laberinto
             laberinto = Maze(
                 tamaño=configuracion['tamaño'],
                 densidad_muros=configuracion['densidad_muros'],
@@ -62,12 +54,7 @@ class Experimentador:
             resultado_genetico = agente_genetico.ejecutar()
             resultados_experimento['genetico'].append(resultado_genetico)
             
-            print(f"    Búsqueda - {resultado_busqueda.exito}, Genético - {resultado_genetico.exito}")
-            
-            if usar_semillas_fijas:
-                print(f"    Semilla: {semilla_actual}")
-            else:
-                print(f"    Semilla aleatoria: {semilla_actual}")
+            print(f"    Búsqueda: {resultado_busqueda.exito}, Genético: {resultado_genetico.exito}")
         
         self.resultados.append(resultados_experimento)
         return resultados_experimento
@@ -81,35 +68,25 @@ class Experimentador:
         for exp in self.resultados:
             config = exp['configuracion']
             print(f"\nExperimento: {config['nombre']}")
-            print(f"Configuración: Tamaño={config['tamaño']}, "
-                  f"Densidad={config['densidad_muros']}, "
-                  f"Movimiento={config['prob_mover_muro']}")
             
             # Estadísticas búsqueda
             resultados_busqueda = exp['busqueda']
             exitos_busqueda = sum(1 for r in resultados_busqueda if r.exito)
-            tiempo_busqueda = np.mean([r.tiempo_ejecucion for r in resultados_busqueda])
-            caminos_exitosos_busqueda = [r.longitud_camino for r in resultados_busqueda if r.exito]
-            longitud_busqueda = np.mean(caminos_exitosos_busqueda) if caminos_exitosos_busqueda else 0
+            tiempo_busqueda = sum(r.tiempo_ejecucion for r in resultados_busqueda) / len(resultados_busqueda)
             
             # Estadísticas genético
             resultados_genetico = exp['genetico']
             exitos_genetico = sum(1 for r in resultados_genetico if r.exito)
-            tiempo_genetico = np.mean([r.tiempo_ejecucion for r in resultados_genetico])
-            caminos_exitosos_genetico = [r.longitud_camino for r in resultados_genetico if r.exito]
-            longitud_genetico = np.mean(caminos_exitosos_genetico) if caminos_exitosos_genetico else 0
+            tiempo_genetico = sum(r.tiempo_ejecucion for r in resultados_genetico) / len(resultados_genetico)
             
             print(f"Búsqueda A*:   {exitos_busqueda}/{config['repeticiones']} exitos "
                   f"({exitos_busqueda/config['repeticiones']*100:.1f}%), "
-                  f"Tiempo: {tiempo_busqueda:.4f}s, "
-                  f"Longitud: {longitud_busqueda:.2f}")
+                  f"Tiempo: {tiempo_busqueda:.4f}s")
+            
             print(f"Algoritmo Genético: {exitos_genetico}/{config['repeticiones']} exitos "
                   f"({exitos_genetico/config['repeticiones']*100:.1f}%), "
-                  f"Tiempo: {tiempo_genetico:.4f}s, "
-                  f"Longitud: {longitud_genetico:.2f}")
-        
+                  f"Tiempo: {tiempo_genetico:.4f}s")
     
     def exportar_resultados(self, archivo='resultados.csv'):
         """Exporta los resultados a un archivo CSV."""
-        print("Exportando resultados tradicionales...")
         exportar_resultados(self.resultados, archivo)

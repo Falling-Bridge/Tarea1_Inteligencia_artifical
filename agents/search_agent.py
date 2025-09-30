@@ -4,13 +4,8 @@ from .base_agent import BaseAgent
 from core.entities import ResultadoBusqueda
 
 class SearchAgent(BaseAgent):
-    """
-    Agente que utiliza el algoritmo A* para encontrar la salida real del laberinto.
-    """
-    
     def __init__(self, laberinto):
         super().__init__(laberinto)
-        self.posicion_actual = laberinto.inicio
         self.nodos_expandidos = 0
         
     def heuristica(self, posicion):
@@ -24,8 +19,6 @@ class SearchAgent(BaseAgent):
         inicio = self.laberinto.inicio
         salida = self.laberinto.salida_real
         
-        print(f"Buscando camino desde {inicio} hasta {salida}...")
-        
         cola = [(0, 0, inicio, [])]
         visitados = set()
         mejor_g = {inicio: 0}
@@ -33,9 +26,6 @@ class SearchAgent(BaseAgent):
         while cola:
             f, g, actual, camino = heapq.heappop(cola)
             self.nodos_expandidos += 1
-            
-            if self.laberinto.tamaño > 30 and self.nodos_expandidos % 1000 == 0:
-                print(f"Nodos expandidos: {self.nodos_expandidos}, Cola: {len(cola)}")
             
             if actual in visitados:
                 continue
@@ -58,7 +48,6 @@ class SearchAgent(BaseAgent):
     
     def ejecutar(self):
         """Ejecuta la búsqueda y devuelve estadísticas."""
-        print(f"Ejecutando A* para laberinto {self.laberinto.tamaño}x{self.laberinto.tamaño}")
         inicio_tiempo = time.time()
         
         camino, exito = self.a_estrella()
@@ -71,9 +60,5 @@ class SearchAgent(BaseAgent):
             tiempo_ejecucion=tiempo_ejecucion,
             camino=camino
         )
-        
-        print(f"Búsqueda A* completada en {tiempo_ejecucion:.2f}s")
-        print(f"Nodos expandidos: {self.nodos_expandidos}")
-        print(f"Éxito: {exito}")
         
         return self.resultado

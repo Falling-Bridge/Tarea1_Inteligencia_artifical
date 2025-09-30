@@ -97,38 +97,22 @@ def obtener_semilla_configuracion():
     else:
         return None  # None indica semilla aleatoria
 
-def generar_configuracion_aleatoria(config_random, semilla_base=None):
-    """Genera una configuración aleatoria según los parámetros dados."""
-    # Usar semilla si se proporciona
-    if semilla_base is not None:
-        random.seed(semilla_base)
+def generar_configuracion_aleatoria(semilla_base=None):
+    """Genera una configuración aleatoria completa."""
+
+    random.seed(semilla_base)
     
-    # Tamaño en múltiplos de 10 entre tamaño_min y tamaño_max
-    tamaño_opciones = list(range(
-        config_random['tamaño_min'], 
-        config_random['tamaño_max'] + 1, 
-        config_random['tamaño_step']
-    ))
-    tamaño = random.choice(tamaño_opciones)
+    tamaño = random.randint(10, 100)
     
-    # Densidad entre densidad_min y densidad_max
-    densidad = round(random.uniform(
-        config_random['densidad_min'], 
-        config_random['densidad_max']
-    ), 2)
+    # Parámetros aleatorios
+    densidad = round(random.uniform(0.1, 0.5), 2)
+    prob_mover_muro = round(random.uniform(0.05, 0.4), 2)
     
-    # Probabilidad de mover muro entre wall_move_prob_min y wall_move_prob_max
-    prob_mover_muro = round(random.uniform(
-        config_random['wall_move_prob_min'], 
-        config_random['wall_move_prob_max']
-    ), 2)
-    
-    # Calcular cantidad de salidas: size/10 + 1 (mínimo 2, máximo según límites del laberinto)
-    cantidad_salidas_base = max(2, math.ceil(tamaño / 10) + 1)
-    max_salidas_posibles = min(15, 2 * tamaño - 1)  # Máximo 15 salidas o menos por restricciones
+    cantidad_salidas_base = math.ceil(tamaño / 10) + 2
+    max_salidas_posibles = min(15, 2 * tamaño - 1)
     cantidad_salidas = min(cantidad_salidas_base, max_salidas_posibles)
     
-    # Longitud del cromosoma basada en el tamaño
+    # Parámetros del algoritmo genético
     longitud_cromosoma = tamaño * 3
     
     return {
@@ -136,8 +120,8 @@ def generar_configuracion_aleatoria(config_random, semilla_base=None):
         'densidad_muros': densidad,
         'prob_mover_muro': prob_mover_muro,
         'cantidad_salidas': cantidad_salidas,
-        'tamaño_poblacion': config_random['tamaño_poblacion'],
+        'tamaño_poblacion': 100,
         'longitud_cromosoma': longitud_cromosoma,
-        'max_generaciones': config_random['max_generaciones'],
-        'repeticiones': config_random['repeticiones_por_config']
+        'max_generaciones': 200,
+        'repeticiones': 3
     }

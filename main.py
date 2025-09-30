@@ -2,11 +2,47 @@ from core.maze import Maze
 from agents.search_agent import SearchAgent
 from agents.genetic_agent import GeneticAgent
 from experiments.experimenter import Experimentador
-from experiments.config import CONFIGURACIONES_PREDEFINIDAS, CONFIG_RANDOM
 from utils.helpers import (clear_screen, obtener_entero, obtener_float, 
                           obtener_semilla_configuracion, generar_configuracion_aleatoria)
 import random
 import math
+
+# Configuraciones predefinidas
+CONFIGURACIONES_PREDEFINIDAS = [
+    {
+        'nombre': 'Pequeño_BajaDensidad',
+        'tamaño': 15,
+        'densidad_muros': 0.1,
+        'cantidad_salidas': math.ceil(15/10) + 2,  # 2 + 2 = 4
+        'prob_mover_muro': 0.05,
+        'tamaño_poblacion': 50,
+        'longitud_cromosoma': 45,
+        'max_generaciones': 50,
+        'repeticiones': 3
+    },
+    {
+        'nombre': 'Medio_MediaDensidad',
+        'tamaño': 30,
+        'densidad_muros': 0.2,
+        'cantidad_salidas': math.ceil(30/10) + 2,  # 3 + 2 = 5
+        'prob_mover_muro': 0.1,
+        'tamaño_poblacion': 100,
+        'longitud_cromosoma': 90,
+        'max_generaciones': 100,
+        'repeticiones': 3
+    },
+    {
+        'nombre': 'Grande_AltaDensidad',
+        'tamaño': 50,
+        'densidad_muros': 0.3,
+        'cantidad_salidas': math.ceil(50/10) + 2,  # 5 + 2 = 7
+        'prob_mover_muro': 0.15,
+        'tamaño_poblacion': 150,
+        'longitud_cromosoma': 150,
+        'max_generaciones': 150,
+        'repeticiones': 3
+    }
+]
 
 def configuracion_personalizada():
     """Permite al usuario configurar todos los parámetros del laberinto."""
@@ -20,8 +56,7 @@ def configuracion_personalizada():
     config['tamaño'] = obtener_entero(
         "Tamaño del laberinto (N x N)", 
         min_val=10, 
-        max_val=1000, 
-        default=20
+        max_val=1000
     )
     
     max_salidas_posibles = min(100, 2 * config['tamaño'] - 1)
@@ -34,24 +69,22 @@ def configuracion_personalizada():
     
     config['densidad_muros'] = obtener_float(
         "Densidad de muros", 
-        min_val=0.0, 
-        max_val=1.0, 
-        default=0.2
+        min_val=0.1, 
+        max_val=0.5
     )
     
     config['prob_mover_muro'] = obtener_float(
         "Probabilidad de mover muros", 
-        min_val=0.0, 
-        max_val=1.0, 
-        default=0.1
+        min_val=0.1, 
+        max_val=0.4
     )
     
     print("\n--- Parámetros del Algoritmo Genético ---")
     config['tamaño_poblacion'] = obtener_entero(
         "Tamaño de la población", 
-        min_val=10, 
-        max_val=1000, 
-        default=100
+        min_val=100, 
+        max_val=1000,
+        default=200
     )
     
     config['longitud_cromosoma'] = obtener_entero(
@@ -71,8 +104,7 @@ def configuracion_personalizada():
     config['repeticiones'] = obtener_entero(
         "Número de repeticiones del experimento", 
         min_val=1, 
-        max_val=100, 
-        default=5
+        max_val=100
     )
     
     # Configuración de semilla
@@ -230,15 +262,19 @@ def ejecutar_experimentos_aleatorios():
     print("=== EXPERIMENTOS ALEATORIOS ===")
     print("Se generarán configuraciones aleatorias de laberintos y algoritmos.")
     print("\nParámetros aleatorios:")
-    print(f"  - Tamaño: {CONFIG_RANDOM['tamaño_min']}-{CONFIG_RANDOM['tamaño_max']} (múltiplos de {CONFIG_RANDOM['tamaño_step']})")
-    print(f"  - Cantidad de salidas: tamaño/10 + 1")
-    print(f"  - Densidad de muros: {CONFIG_RANDOM['densidad_min']}-{CONFIG_RANDOM['densidad_max']}")
-    print(f"  - Prob. mover muros: {CONFIG_RANDOM['wall_move_prob_min']}-{CONFIG_RANDOM['wall_move_prob_max']}")
-    print(f"  - Población: {CONFIG_RANDOM['tamaño_poblacion']}")
-    print(f"  - Generaciones: {CONFIG_RANDOM['max_generaciones']}")
+    print(f"  - Tamaño: 10-100 (cualquier entero)")
+    print(f"  - Cantidad de salidas: ceil(tamaño/10) + 2")
+    print(f"  - Densidad de muros: 0.1-0.5")
+    print(f"  - Prob. mover muros: 0.1-0.4")
+    print(f"  - Población: 100")
+    print(f"  - Generaciones: 200")
     print(f"  - Cromosoma: tamaño_laberinto * 3")
-    print(f"\nSe ejecutarán {CONFIG_RANDOM['total_experimentos']} configuraciones diferentes")
-    print(f"con {CONFIG_RANDOM['repeticiones_por_config']} repeticiones cada una.")
+    
+    total_experimentos = obtener_entero("Número de configuraciones aleatorias", 1, 20, 5)
+    repeticiones = obtener_entero("Repeticiones por configuración", 1, 10, 3)
+    
+    print(f"\nSe ejecutarán {total_experimentos} configuraciones diferentes")
+    print(f"con {repeticiones} repeticiones cada una.")
     
     confirmar = input("\n¿Ejecutar experimentos aleatorios? (s/n): ").strip().lower()
     
@@ -252,13 +288,13 @@ def ejecutar_experimentos_aleatorios():
     
     experimentador = Experimentador()
     
-    print(f"\nGenerando {CONFIG_RANDOM['total_experimentos']} configuraciones aleatorias...")
+    print(f"\nGenerando {total_experimentos} configuraciones aleatorias...")
     
-    for i in range(CONFIG_RANDOM['total_experimentos']):
-        config = generar_configuracion_aleatoria(CONFIG_RANDOM, semilla_configs)
+    for i in range(total_experimentos):
+        config = generar_configuracion_aleatoria()
+        config['repeticiones'] = repeticiones
         
-        # Crear nombre simplificado
-        nombre_experimento = f"{config['tamaño']}x{config['tamaño']}_den:{config['densidad_muros']:.1f}_move:{config['prob_mover_muro']:.1f}"
+        nombre_experimento = f"{config['tamaño']}x{config['tamaño']}-{config['densidad_muros']}-{config['prob_mover_muro']}"
         
         config_experimento = {
             'nombre': nombre_experimento,
@@ -267,24 +303,17 @@ def ejecutar_experimentos_aleatorios():
             'cantidad_salidas': config['cantidad_salidas'],
             'prob_mover_muro': config['prob_mover_muro'],
             'repeticiones': config['repeticiones'],
-            'semilla_base': semilla_configs,  # Usar la misma semilla para todas las repeticiones
+            'semilla_base': semilla_configs,
             'tamaño_poblacion': config['tamaño_poblacion'],
             'longitud_cromosoma': config['longitud_cromosoma'],
             'max_generaciones': config['max_generaciones']
         }
         
-        print(f"\n--- Configuración {i+1}/{CONFIG_RANDOM['total_experimentos']} ---")
-        print(f"  Nombre: {nombre_experimento}")
+        print(f"\n--- Configuración {i+1}/{total_experimentos} ---")
         print(f"  Tamaño: {config['tamaño']}x{config['tamaño']}")
         print(f"  Densidad: {config['densidad_muros']}")
         print(f"  Prob. mover muros: {config['prob_mover_muro']}")
-        print(f"  Salidas: {config['cantidad_salidas']} (tamaño/10 + 1)")
-        print(f"  Población: {config['tamaño_poblacion']}")
-        print(f"  Cromosoma: {config['longitud_cromosoma']}")
-        print(f"  Generaciones: {config['max_generaciones']}")
-        print(f"  Repeticiones: {config['repeticiones']}")
-        if semilla_configs is not None:
-            print(f"  Semilla base: {semilla_configs}")
+        print(f"  Salidas: {config['cantidad_salidas']} (ceil({config['tamaño']}/10) + 2 = {math.ceil(config['tamaño']/10) + 2})")
         
         experimentador.ejecutar_experimento(config_experimento)
     
