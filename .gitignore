@@ -1,0 +1,84 @@
+# PyChache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# PyCharm IDE
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+logs/
+
+# Data files
+*.csv
+*.json
+*.pkl
+*.pickle
+
+# Image files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+
+# Plot outputs
+plots/
+graphics/
+figures/
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# Profiling data
+.prof
+
+# Package files
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
+.env
+.env.local
+
+# Database files
+*.db
+*.sqlite3
+
+# Backup files
+backup/
+*.bak
