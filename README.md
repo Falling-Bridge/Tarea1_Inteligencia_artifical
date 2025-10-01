@@ -39,24 +39,17 @@ Este proyecto enfrenta a dos tipos de agentes dentro de un **laberinto mutante**
 El laberinto cambia dinámicamente: con cada paso del agente, algunos muros pueden desplazarse ortogonalmente, manteniéndose dentro de los límites. Además, existen múltiples salidas, pero solo una es la verdadera, mientras que las demás son falsas y conducen a callejones sin salida.  
 
 ---
+## Requerimientos 
 
-## 🎮 Interfaz interactiva  
-
-El programa ofrece un menú de interacción vía teclado con las siguientes opciones:  
-
+Primero debe copiar el repositorio a su computadora, lo puede hacer mediante el siguiente comando para el cual necesitará tener ```git```
 
 ```
-ESCAPE DEL LABERINTO MUTANTE
-============================
+git clone https://github.com/Falling-Bridge/Tarea1_Inteligencia_artifical.git
+```
 
-Opciones:
-1. Demostración básica
-2. Experimento personalizado
-3. Experimentos predefinidos
-4. Experimentos aleatorios
-5. Salir
-
-Seleccione una opción:
+Se requiere instalar las librerías dentro del archivo ```requirements.txt```
+```
+pip install -r requirements.txt
 ```
 ---
 ## ⚙️ Ejecución del programa  
